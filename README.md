@@ -1,6 +1,9 @@
-# Getting Started with Create React App
+# WIX multilingual editor
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Wix multilingual editor for public
+
+## Usage
+import the export file and edit on this website, then export the files
 
 ## Available Scripts
 
