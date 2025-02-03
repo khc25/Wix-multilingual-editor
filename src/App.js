@@ -2,7 +2,7 @@ import './App.css';
 import { useEffect, useState, Suspense, lazy, } from 'react';
 import { useForm } from 'react-hook-form';
 import CsvFileInput from './components/CsvFileInput';
-import { Grid, Paper, Button, Container, Pagination, Select, MenuItem, InputLabel, Typography, Backdrop, CircularProgress } from '@mui/material';
+import { FormControl, Grid, Paper, Button, Container, Pagination, Select, MenuItem, InputLabel, Typography, Backdrop, CircularProgress } from '@mui/material';
 // import CsvDownloadButton from 'react-json-to-csv'
 import Papa from 'papaparse'
 import ResponsiveAppBar from './components/Bar';
@@ -41,6 +41,8 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10; // Adjust the number of rows per page as needed
 
+  const [lang, setLang] = useState('ZH')
+
   const paginatedData = data.slice((currentPage - 1) * rowsPerPage, (currentPage - 1 + 1) * rowsPerPage);
 
 
@@ -59,16 +61,9 @@ function App() {
   useEffect(() => {
     if (paginatedData.length > 0) {
       const currentRow = paginatedData[0]; // Get the first row of the current page
-      setValue(`data.${(currentPage - 1) * rowsPerPage}.Target language (ZH)`, currentRow['Target language (ZH)'] || '');
+      setValue(`data.${(currentPage - 1) * rowsPerPage}.Target language (${lang})`, currentRow[`Target language (${lang})`] || '');
     }
-  }, [currentPage, paginatedData, setValue]);
-
-  /* The `console.log(data)` statement in the code is logging the `data` variable to the console. This
-  can be helpful for debugging purposes or to understand the structure and content of the `data`
-  variable at that point in the code execution. It allows developers to inspect the data and see its
-  values, which can be useful for troubleshooting or verifying the data being used in the
-  application. */
-  // console.log(data)
+  }, [currentPage, paginatedData, setValue, lang]);
 
   const handlePageSelect = (event) => {
     setCurrentPage(event.target.value);
@@ -85,17 +80,37 @@ function App() {
     document.body.removeChild(link);
   };
 
+  // console.log(watch('data'))
+
   return (
     <>
       <ResponsiveAppBar />
       <Container>
 
-        <Grid container>
-          <Grid item xs={6}>
+        <Grid container spacing={3}>
+          <Grid item xs={4}>
+            <Typography>Select A language</Typography>
+            <br />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Language</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={lang}
+                label="Language"
+                onChange={(e) => setLang(e.target.value)}
+              >
+                <MenuItem value={'ZH'}>ZH</MenuItem>
+                <MenuItem value={'FR'}>FR</MenuItem>
+
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
             <Typography>Select File to import</Typography>
             <CsvFileInput onFileLoad={handleFileLoad} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Typography>Export file</Typography>
             {
               data.length > 0 &&
@@ -142,8 +157,11 @@ function App() {
                   <Paper>
                     <Suspense fallback={<CircularProgress />}>
                       <SunEditorPage
-                        initData={watch(`data.${idx}.Target language (ZH)`) || ''}
-                        setValue={(value) => setValue(`data.${idx}.Target language (ZH)`, value)}
+                        initData={watch(`data.${idx}.Target language (${lang})`) || ''}
+                        setValue={(value) => {
+                          setValue(`data.${idx}.Target language (${lang})`, value)
+                          // setValue(`data.${idx}.Target language (FR)`, value)
+                        }}
                       />
                     </Suspense>
                   </Paper>
