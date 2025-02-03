@@ -3,7 +3,8 @@ import { useEffect, useState, Suspense, lazy, } from 'react';
 import { useForm } from 'react-hook-form';
 import CsvFileInput from './components/CsvFileInput';
 import { Grid, Paper, Button, Container, Pagination, Select, MenuItem, InputLabel, Typography, Backdrop, CircularProgress } from '@mui/material';
-import CsvDownloadButton from 'react-json-to-csv'
+// import CsvDownloadButton from 'react-json-to-csv'
+import Papa from 'papaparse'
 import ResponsiveAppBar from './components/Bar';
 
 const SunEditorPage = lazy(() => import('./components/SunEditor'));
@@ -16,6 +17,23 @@ function App() {
     setValue('data', csvData);
     setLoading(false);
   };
+  // const handleFileLoad = (csvData) => {
+  //   setLoading(true);
+
+  //   // Map through the csvData to parse the keys that need to be objects
+  //   const parsedData = csvData.map((row) => {
+  //     return {
+  //       ...row,
+  //       "ID (do not edit)": JSON.parse(row["ID (do not edit)"]),
+  //       // Parse other fields as necessary
+  //       "Source language (EN)": row["Source language (EN)"], // keep as is if it's not a JSON string
+  //       "Target language (ZH)": row["Target language (ZH)"], // keep as is if it's not a JSON string
+  //     };
+  //   });
+
+  //   setValue('data', parsedData);
+  //   setLoading(false);
+  // };
 
   const [loading, setLoading] = useState(false);
 
@@ -45,10 +63,26 @@ function App() {
     }
   }, [currentPage, paginatedData, setValue]);
 
-  // console.log(data.length)
+  /* The `console.log(data)` statement in the code is logging the `data` variable to the console. This
+  can be helpful for debugging purposes or to understand the structure and content of the `data`
+  variable at that point in the code execution. It allows developers to inspect the data and see its
+  values, which can be useful for troubleshooting or verifying the data being used in the
+  application. */
+  // console.log(data)
 
   const handlePageSelect = (event) => {
     setCurrentPage(event.target.value);
+  };
+
+  const handleDownload = () => {
+    const csv = Papa.unparse(watch('data'));
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'data.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -65,7 +99,7 @@ function App() {
             <Typography>Export file</Typography>
             {
               data.length > 0 &&
-              <CsvDownloadButton data={watch('data')} />
+              <button onClick={handleDownload}>Download CSV</button>
             }
 
           </Grid>
