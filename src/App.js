@@ -39,7 +39,7 @@ function App() {
 
   const data = watch('data') || [];
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10; // Adjust the number of rows per page as needed
+  const rowsPerPage = 50; // Adjust the number of rows per page as needed
 
   const [lang, setLang] = useState('ZH')
 
@@ -144,16 +144,19 @@ function App() {
 
         </div>
         {paginatedData && paginatedData.length > 0 ? (
-          paginatedData.map((row) => {
+          paginatedData.map((row, index) => {
             const idx = data.findIndex(r => r['ID (do not edit)'] === row['ID (do not edit)']);
             return (
               <Grid container key={idx} spacing={2}>
-                <Grid item xs={6}>
+                <Grid item xs={2}>
+                  <Typography variant="h5">{(currentPage - 1) * rowsPerPage + index + 1}</Typography>
+                </Grid>
+                <Grid item xs={5}>
                   <Paper>
                     <div dangerouslySetInnerHTML={{ __html: row['Source language (EN)'] || '' }} />
                   </Paper>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <Paper>
                     <Suspense fallback={<CircularProgress />}>
                       <SunEditorPage
